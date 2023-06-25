@@ -27,7 +27,17 @@ const signToken = function (id) {
     process.env.JWT_SECRET
   );
 };
+const createSendToken = function(user,statuscode,res){
+  const token = signToken(user._id);
 
+  res.status(statuscode).json({
+    status: 'success',
+    token: token,
+    data: {
+      user,
+    },
+  });
+}
 exports.signup = catchAsync(async (req, res, next) => {
   // Code snippet 1: Explicitly defining object properties
 
@@ -43,16 +53,8 @@ exports.signup = catchAsync(async (req, res, next) => {
   // Code snippet 2: Passing entire req.body object
   //const newUser = await User.create(req.body);
   // Here, all properties in the req.body object will be passed to the User.create() method without specifing what to pass.
+createSendToken(newUser,201,res)
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token: token,
-    data: {
-      newUser,
-    },
-  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -78,11 +80,9 @@ exports.login = catchAsync(async (req, res, next) => {
   const expirationTime = new Date(decoded.exp * 1000); // Convert Unix timestamp to milliseconds
 
   console.log('Token was issued at:', issuedAt.toISOString());
-  console.log('Token will expire at:', expirationTime.toISOString());
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  console.log('Token will expire at:', expirationTime.toISOString())
+  createSendToken(user,200,res)
+ 
 });
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -197,6 +197,24 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 3) Update changedPasswordAt property for the user
   // 4) Log the user in, send JWT
-const token = signToken(user._id);
-  res.status(200).json({status:'success',token:token});
+  createSendToken(user,200,res)
+});
+/////////////////////////////////////////////////////////////////////////////////
+exports.updatePassword = catchAsync(async (req, res, next) => { 
+//1) Get user from collection
+const user = await User.findById(req.user.id).select('+password');
+if(!user){
+  return next(new AppError('There is no such a user', 404));
+}
+//2)check if current password is same as saved in database
+if(!user.correctPassword(req.body.passwordCurrent,user.password))
+{
+  return next(new AppError('Please enter a correct password', 401));
+}
+//3)if they are matched then update the password
+user.password=req.body.password
+user.passwordConfirm=req.body.passwordConfirm
+await user.save()
+//4)logging the user in
+createSendToken(user,200,res)
 });
