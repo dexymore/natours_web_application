@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 // validator is a library used for validating
 const validator = require('validator');
+const crypto = require('crypto');
 
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-
   name: {
     type: String,
     required: [true, 'a user must have a name'],
@@ -22,10 +22,10 @@ const userSchema = new mongoose.Schema({
   photo: {
     type: String,
   },
-  role:{
+  role: {
     type: String,
-    enum: ["user", "admin", "lead-guide", "guide"],
-    default:"user"
+    enum: ['user', 'admin', 'lead-guide', 'guide'],
+    default: 'user',
   },
   password: {
     type: 'string',
@@ -45,6 +45,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordchangedat: { type: Date },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -72,18 +74,41 @@ userSchema.methods.correctPassword = async function (
   // If the passwords match, the Promise resolves to true; otherwise, it resolves to false
   // The Promise is returned by the function, allowing the caller to handle the result appropriately
 };
-userSchema.methods.changedAasswordAfter = function(JWTTimestamp) {
+userSchema.methods.changedAasswordAfter = function (JWTTimestamp) {
   if (this.passwordchangedat) {
     const changedTimestamp = parseInt(
       this.passwordchangedat.getTime() / 1000,
       10
     );
-console.log(JWTTimestamp,changedTimestamp)
+    console.log(JWTTimestamp, changedTimestamp);
     return JWTTimestamp < changedTimestamp;
   }
 
   // False means NOT changed
   return false;
 };
+userSchema.methods.createPasswordResetToken = function () {
+ const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
+userSchema.pre('save',function (next) {
+if(!this.isModified('password') || this.isNew) return next()
+this.passwordchangedat=Date.now()-1000;
+next();
+});
+
 const User = mongoose.model('User', userSchema);
+
+
 module.exports = User;

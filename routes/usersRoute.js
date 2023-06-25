@@ -14,6 +14,8 @@ const {
 
 usersRouter.post('/signup',authController.signup)
 usersRouter.post('/login',authController.login)
+usersRouter.post('/forgetpassword',authController.forgetpassword)
+usersRouter.patch('/resetpassword/:token',authController.resetPassword)
 
 usersRouter.route('/').get(getAllusers).post(createuser);
 
