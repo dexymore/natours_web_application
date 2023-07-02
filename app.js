@@ -1,6 +1,10 @@
 const morgan = require('morgan');
 const express = require('express'); // Express web server framework makes node js more convenient amd easy to use
-
+const rateLimit=require('express-rate-limit')
+const helmet = require('helmet');
+const mongoSanitize=require('express-mongo-sanitize')
+const xssClean= require('xss-clean')
+const hpp= require('hpp')
 const AppError=require('./utils/appError')
 
 const globalErorrHandler= require('./controllers/errorController')
@@ -10,11 +14,25 @@ const usersRouter = require('./routes/usersRoute');
 
 const app = express(); // create our app with express
 
+app.use(helmet());
+//1)global middlewares
 
-//1) middlewares
 
-app.use(express.json()); //using middleware
+const limiter=rateLimit({
+  // you shouldnot follow this blindely instead you should specify them depending on the service you provide 
+  max:100,// number of requestes
+  windowMs:60*60*1000,// time window which mean you will receive 100 request per hour from this ip
+message:"too many request from this ip please try again latter"
+})
+app.use('/api',limiter)
 
+app.use(express.json({limit:'10kb'})); //using middleware
+// this used to prevent noSQl injections attack and should be put under the line where we allow to recive inputs from user
+app.use(mongoSanitize())
+// this used to prevent injection of hTml and javascript code in users inputs
+app.use(xssClean())
+// this is used to preveant parameter pollutuins
+app.use(hpp({whitelist:['duration',  "ratingsAverage", "ratingsQuantity", "maxGroupSize","difficulty","price"]}))
 // app.use((req, res, next) => {
 //   console.log('hello from middleware'); // middleware is somthing stands in the middle between the request and the response cycl
 //   // in order to use the middleware we need to use the "USE METHOD" and then craate a function with three parameters

@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema({
   passwordchangedat: { type: Date },
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active:{type:Boolean,default:true,select:false},
 });
 
 userSchema.pre('save', async function (next) {
@@ -108,7 +109,11 @@ this.passwordchangedat=Date.now()-1000;
 next();
 });
 
-
+userSchema.pre(/^find/,function(next){
+//this point to the current querry
+this.find({active:{$ne:false}})
+next()
+})
 const User = mongoose.model('User', userSchema);
 
 
