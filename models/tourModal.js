@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
+const User= require('./userModal.js')
+
 const slugify = require('slugify');
+
+
 
 const validator = require('validator');
 
@@ -80,11 +84,43 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      //geojson property
+      type:{
+        type:String ,
+        default:'Point',
+        enum:['Point'],
+    
+      },
+      coordinates:[Number],
+      address:String,
+      description:String,
+        },
+        
+   locations:[ {
+          //geojson property
+          type:{
+            type:String ,
+            default:'Point',
+            enum:['Point'],
+        
+          },
+          coordinates:[Number],
+          address:String,
+          description:String,
+        day:Number   
+        }],
+      guides:[{
+        type:mongoose.Schema.ObjectId,
+        ref:'User'
+      }]
   },
+
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
+  
 );
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
@@ -111,7 +147,11 @@ tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });
-
+// tourSchema.pre('save', async function(next) {
+//   const guidesPromises = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
