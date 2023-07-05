@@ -4,6 +4,8 @@ const AppError = require('../utils/appError');
 
 const User = require('../models/userModal');
 
+const factory=require('./handlerFactory')
+
 const filteredObj = function (obj, ...objkeys) {
   const filteredobject = {};
   Object.keys(obj).forEach((el) => {
@@ -67,6 +69,4 @@ exports.updateuser = (req, res) => {
   res.status(500).json({ statusbar: 'error', message: 'not implemented yet' });
 };
 
-exports.delteuser = (req, res) => {
-  res.status(500).json({ statusbar: 'error', message: 'not implemented yet' });
-};
+exports.delteuser=factory.deleteOne(User)

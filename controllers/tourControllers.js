@@ -7,6 +7,8 @@ const ApiFeatures = require('../utils/apiFeatuers');
 const Tour = require('../models/tourModal');
 const AppError = require('../utils/appError');
 
+const factory=require('./handlerFactory')
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -57,7 +59,7 @@ exports.createTour = async (req, res) => {
 
 exports.getTour = catchAsync( async (req, res, next) => {
   
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
   if (!tour) { 
    return  next(new AppError(`no tour found with that id `  ,404))
   }
@@ -83,18 +85,21 @@ exports.updateTour =catchAsync(  async (req, res,next) => {
   // if the tour does not exist we send code 404 which indicates that the tour does not exist
 });
 
-exports.delteTour =catchAsync( async (req, res,next) => {
+// exports.delteTour =catchAsync( async (req, res,next) => {
 
-    const tour=await Tour.findByIdAndDelete(req.params.id);
-    if (!tour) { 
-      return  next(new AppError(`no tour found with that id `  ,404))
-     }  
-  res.status(204).json({
-      status: 'success',
-      data: null,
-    });
+//     const tour=await Tour.findByIdAndDelete(req.params.id);
+//     if (!tour) { 
+//       return  next(new AppError(`no tour found with that id `  ,404))
+//      }  
+//   res.status(204).json({
+//       status: 'success',
+//       data: null,
+//     });
   
-});
+// });
+
+
+exports.delteTour=factory.deleteOne(Tour)
 
 //aggregtion pipeline with moongoose
 // In this code, _id is used as a grouping operator in the MongoDB aggregation pipeline. It specifies the field that will be used to group the documents in the collection.

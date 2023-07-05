@@ -1,10 +1,8 @@
 const mongoose = require('mongoose');
 
-const User= require('./userModal.js')
+const User = require('./userModal.js');
 
 const slugify = require('slugify');
-
-
 
 const validator = require('validator');
 
@@ -18,7 +16,7 @@ const tourSchema = new mongoose.Schema(
       maxlength: [40, 'a tour name must be less or equal to 40 chars'],
       minlength: [10, 'a tour name must be more or equal to 40 chars'],
       //validate:[validator.isAlpha,"tour name must only contain alpha characters"]
-    }, 
+    },
     duration: {
       type: Number,
       required: [true, 'a tour must have a duration'],
@@ -86,44 +84,50 @@ const tourSchema = new mongoose.Schema(
     },
     startLocation: {
       //geojson property
-      type:{
-        type:String ,
-        default:'Point',
-        enum:['Point'],
-    
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
       },
-      coordinates:[Number],
-      address:String,
-      description:String,
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+
+    locations: [
+      {
+        //geojson property
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
         },
-        
-   locations:[ {
-          //geojson property
-          type:{
-            type:String ,
-            default:'Point',
-            enum:['Point'],
-        
-          },
-          coordinates:[Number],
-          address:String,
-          description:String,
-        day:Number   
-        }],
-      guides:[{
-        type:mongoose.Schema.ObjectId,
-        ref:'User'
-      }]
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
 
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
-  
 );
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
+});
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
 });
 // this middleware run s on saving and creating a new document but doesont run on updating  the document
 tourSchema.pre('save', function (next) {

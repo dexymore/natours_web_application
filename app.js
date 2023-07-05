@@ -9,7 +9,7 @@ const AppError=require('./utils/appError')
 
 const globalErorrHandler= require('./controllers/errorController')
 
-const toursRouter = require('./routes/reviewRoute');
+const toursRouter = require('./routes/toursRoute');
 const reviewRouter = require('./routes/reviewRoute');
 const usersRouter = require('./routes/usersRoute');
 

@@ -20,7 +20,7 @@ usersRouter.post('/forgetpassword',authController.forgetpassword)
 usersRouter.patch('/resetpassword/:token',authController.resetPassword)
 usersRouter.patch('/updatemypassword',authController.protect,authController.updatePassword)
 usersRouter.patch('/updateme',authController.protect,updateme)
-usersRouter.route('/').get(getAllusers).post(createuser);
+usersRouter.route('/').get(getAllusers).post(createuser)
 usersRouter.delete('/deleteme',authController.protect,deleteme)
 usersRouter.route('/:id').get(getuser).patch(updateuser).delete(delteuser); 
 module.exports = usersRouter;
