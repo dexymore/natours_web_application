@@ -13,6 +13,10 @@ const filteredObj = function (obj, ...objkeys) {
   });
   return filteredobject;
 };
+exports.getme=(req,res,next)=>{
+  req.params.id=req.user.id
+next()
+}
 
 exports.updateme = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
@@ -48,25 +52,14 @@ exports.deleteme = catchAsync(async (req, res, next) => {
   next()
 });
 
-exports.getAllusers = catchAsync(async (req, res) => {
-  const users = await User.find();
 
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
 
-    data: { users },
-  });
-});
 exports.createuser = (req, res) => {
-  res.status(500).json({ statusbar: 'error', message: 'not implemented yet' });
+  res.status(500).json({ statusbar: 'error', message: 'this route is not defined and please use sign up instead' });
 };
-exports.getuser = (req, res) => {
-  res.status(500).json({ statusbar: 'error', message: 'not implemented yet' });
-};
-
-exports.updateuser = (req, res) => {
-  res.status(500).json({ statusbar: 'error', message: 'not implemented yet' });
-};
+exports.getAllusers = factory.getAlldocs(User)
+exports.getuser = factory.getOne(User)
+// this is not used to update passowrds
+exports.updateuser = factory.updateOne(User )
 
 exports.delteuser=factory.deleteOne(User)

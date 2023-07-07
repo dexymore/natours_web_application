@@ -3,17 +3,19 @@ const express = require('express');
 const authController=require('../controllers/authController');
 
 const usersRouter = express.Router();
-const {
+const {  
+  getme,
   getAllusers,
   createuser,
   getuser,
   updateuser,
   delteuser,
   updateme,
-  deleteme
+  deleteme,
+
 } = require('../controllers/usersController');
 
-
+usersRouter.get('/getme',authController.protect,getme,getuser)
 usersRouter.post('/signup',authController.signup)
 usersRouter.post('/login',authController.login)
 usersRouter.post('/forgetpassword',authController.forgetpassword)

@@ -1,11 +1,11 @@
 const express = require('express');
 
 const catchAsync= require('../utils/catchAsync')
-// eslint-disable-next-line import/extensions
-const ApiFeatures = require('../utils/apiFeatuers');
 
+// eslint-disable-next-line import/extensions
+// const ApiFeatures = require('../utils/apiFeatuers');
 const Tour = require('../models/tourModal');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
 
 const factory=require('./handlerFactory')
 
@@ -23,67 +23,11 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async  (req, res) => {
+exports.getAllTours =factory.getAlldocs(Tour)
 
- 
-
-    const featuers = new ApiFeatures(Tour.find(), req.query)
-      .filter()
-      .sort()
-      .field()
-      .paginate();
-    const tours = await featuers.query;
-
-    res.status(200).json({
-      status: 'success',
-      results: tours.length,
-
-      data: { tours },
-    });
-  
-});
-exports.createTour = async (req, res) => {
-  try {
-    const newTour = await Tour.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      data: { tours: newTour },
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
-
-exports.getTour = catchAsync( async (req, res, next) => {
-  
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-  if (!tour) { 
-   return  next(new AppError(`no tour found with that id `  ,404))
-  }
-
-    res.status(200).json({ status: 'success', data: { tour } });
- 
-});
-exports.updateTour =catchAsync(  async (req, res,next) => {
-  // first we check if the tour exists
-
-
-    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!tour) { 
-      return  next(new AppError(`no tour found with that id `  ,404))
-     }
-  
-    res.status(200).json({ status: 'success', data: { tour } });
- 
-
-  // if the tour does not exist we send code 404 which indicates that the tour does not exist
-});
+exports.getTour = factory.getOne(Tour,{path:'reviews'})
+exports.createTour =factory.createOne(Tour)
+exports.updateTour =factory.updateOne(Tour)
 
 // exports.delteTour =catchAsync( async (req, res,next) => {
 
