@@ -15,14 +15,17 @@ const {
 
 } = require('../controllers/usersController');
 
-usersRouter.get('/getme',authController.protect,getme,getuser)
 usersRouter.post('/signup',authController.signup)
 usersRouter.post('/login',authController.login)
 usersRouter.post('/forgetpassword',authController.forgetpassword)
 usersRouter.patch('/resetpassword/:token',authController.resetPassword)
+usersRouter.use(authController.protect)
 usersRouter.patch('/updatemypassword',authController.protect,authController.updatePassword)
 usersRouter.patch('/updateme',authController.protect,updateme)
-usersRouter.route('/').get(getAllusers).post(createuser)
+usersRouter.get('/getme',authController.protect,getme,getuser)
 usersRouter.delete('/deleteme',authController.protect,deleteme)
+usersRouter.use(authController.restrict('admin'))
 usersRouter.route('/:id').get(getuser).patch(updateuser).delete(delteuser); 
+usersRouter.route('/').get(getAllusers).post(createuser)
+
 module.exports = usersRouter;

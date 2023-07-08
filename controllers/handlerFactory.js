@@ -63,13 +63,13 @@ exports.getAlldocs = (Model) =>
       .sort()
       .field()
       .paginate();
+    // const docs = await featuers.query.explain();
     const docs = await featuers.query;
-
     res.status(200).json({
       status: 'success',
       results: docs.length,
 
       data: { data: docs },
     });
-    next();
+    
   });

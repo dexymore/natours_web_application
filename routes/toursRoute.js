@@ -11,6 +11,8 @@ const {
   aliasTopTours,
   getToursStats,
   getMonthlyPlan,
+  getToursWithin,
+  getDistances
 } = require('../controllers/tourControllers');
 
 const toursRouter = express.Router();
@@ -18,15 +20,18 @@ const toursRouter = express.Router();
 toursRouter.use('/:tourId/reviews',reviewRouter)
 toursRouter.route('/top-5-cheap').get(aliasTopTours, getAllTours);
 toursRouter.route('/tour-stats').get(getToursStats);
-toursRouter.route('/').get(auth.protect, getAllTours).post(createTour);
-toursRouter.route('/monthly-plan/:year').get(getMonthlyPlan);
+toursRouter.route('/tours-within/:distance/center/:latlng/unit/:unit').get(getToursWithin)
+toursRouter.route('/distances/:latlng/unit/:unit').get(getDistances)
+toursRouter.route('/').get( getAllTours).post(auth.protect, auth.restrict('admin', 'lead-guide'),createTour);
+toursRouter.route('/monthly-plan/:year').get(auth.protect, auth.restrict('admin', 'lead-guide','guide'),getMonthlyPlan);
 toursRouter
   .route('/:id')
   .get(getTour)
-  .patch(updateTour)
+  .patch(auth.protect, auth.restrict('admin', 'lead-guide'),updateTour)
   .delete(auth.protect, auth.restrict('admin', 'lead-guide'), delteTour);
 // toursRouter
 //   .route('/:tourId/reviews')
 //   .post(auth.protect, auth.restrict('user'), reviewController.postNewReview);
+
 
 module.exports = toursRouter;
