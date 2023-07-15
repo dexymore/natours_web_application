@@ -1,3 +1,4 @@
+const path = require('path');
 const morgan = require('morgan');
 const express = require('express'); // Express web server framework makes node js more convenient amd easy to use
 const rateLimit=require('express-rate-limit')
@@ -12,10 +13,16 @@ const globalErorrHandler= require('./controllers/errorController')
 const toursRouter = require('./routes/toursRoute');
 const reviewRouter = require('./routes/reviewRoute');
 const usersRouter = require('./routes/usersRoute');
+const viewRouter = require('./routes/viewRoute');
+
+const cookieParser = require('cookie-parser');
 
 const app = express(); // create our app with express
-
-app.use(helmet());
+// this is used to set the pug template engine  
+app.set('view engine', 'pug');
+app.set('views',path.join(__dirname,'views')) // this is used to set the path of the views folder;
+app.use(express.static(path.join(__dirname,'public')))// this is used to set the path of the public folder;
+app.use(helmet({ contentSecurityPolicy: false }));
 //1)global middlewares
 
 
@@ -28,7 +35,9 @@ message:"too many request from this ip please try again latter"
 app.use('/api',limiter)
 
 app.use(express.json({limit:'10kb'})); //using middleware
+app.use(cookieParser());
 // this used to prevent noSQl injections attack and should be put under the line where we allow to recive inputs from user
+
 app.use(mongoSanitize())
 // this used to prevent injection of hTml and javascript code in users inputs
 app.use(xssClean())
@@ -49,14 +58,14 @@ if (process.env.NODE_ENV === 'development') {
 }else app.use(morgan('prod')); // log every request to the console
 ///////////////////////////////////////////////////////
 
-app.get('/', (req, res) => {
-  // when the user visits the homepage, we send hello world and everything is fine
+// app.get('/', (req, res) => {
+//   // when the user visits the homepage, we send hello world and everything is fine
 
-  res.status(200).json({ message: 'Hello World!', app: 'natours' });
-});
-app.post('/', (req, res) => {
-  res.send('you can send a post request');
-});
+//   res.status(200).json({ message: 'Hello World!', app: 'natours' });
+// });
+// app.post('/', (req, res) => {
+//   res.send('you can send a post request');
+// });
 
 /////////////////////////////////
 
@@ -65,7 +74,13 @@ app.post('/', (req, res) => {
 ///users routes handlers
 
 //3)routes
+app.use((req,res,next)=>{
+  req.requestTime=new Date().toISOString()
 
+  next()
+})
+
+app.use('/', viewRouter);
 app.use('/api/v1/users', usersRouter);
 
 app.use('/api/v1/tours', toursRouter);

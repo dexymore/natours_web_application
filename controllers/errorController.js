@@ -22,35 +22,63 @@ const handleDuplicateFieldDb =function (err)  {
 const handleJwtError=()=> new AppError('invalid token.please login again',401)
 
 
-const sendErorrDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
-  });
+const sendErorrDev = (err,req ,res) => {
+
+  //operational error :send message to client
+  if(req.originalUrl.startsWith('/api')){
+   res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack:err.stack
+    });
+  }else{
+ res.status(err.statusCode).render('error',{
+      title:'something went wrong',
+      msg:err.message
+    })
+  }
+
+   
 };
 
-const sendErorrProd = (err, res) => {
-  //operational error :send message to client
- // Operational, trusted error: send message to client
- if (err.isOperational) {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message
-  });
-
-  // Programming or other unknown error: don't leak error details
-} else {
+const sendErorrProd = (err, req,res) => {
+ // A) API
+ if (req.originalUrl.startsWith('/api')) {
+  // A) Operational, trusted error: send message to client
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message
+    });
+  }
+  // B) Programming or other unknown error: don't leak error details
   // 1) Log error
   console.error('ERROR 💥', err);
-
   // 2) Send generic message
-  res.status(500).json({
+  return res.status(500).json({
     status: 'error',
     message: 'Something went very wrong!'
   });
 }
+
+// B) RENDERED WEBSITE
+// A) Operational, trusted error: send message to client
+if (err.isOperational) {
+  console.log(err);
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: err.message
+  });
+}
+// B) Programming or other unknown error: don't leak error details
+// 1) Log error
+console.error('ERROR 💥', err);
+// 2) Send generic message
+return res.status(err.statusCode).render('error', {
+  title: 'Something went wrong!',
+  msg: 'Please try again later.'
+});
 };
 
 
@@ -62,11 +90,11 @@ module.exports = (err, req, res, next) => {
   // Send error response based on environment
   if (process.env.NODE_ENV === 'development') {
   
-   sendErorrDev(err, res);
+   sendErorrDev(err,req, res);
   } else {
 
     let error = {... err };
-
+error.message=err.message
     // Handle specific error types
     if (err.name === 'CastError') {
 
@@ -82,6 +110,6 @@ module.exports = (err, req, res, next) => {
   
     }
 
-    sendErorrProd(error, res);
+    sendErorrProd(error,req, res);
   }
 };

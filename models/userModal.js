@@ -21,18 +21,22 @@ const userSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
+    default: 'default.jpg',
   },
   role: {
     type: String,
     enum: ['user', 'admin', 'lead-guide', 'guide'],
     default: 'user',
   },
+
+
   password: {
     type: 'string',
     required: [true, 'a user must have a password'],
     minlength: [8, 'a user password must be more or equal to 8 chars'],
     select: false,
   },
+  
   passwordConfirm: {
     type: 'string',
     required: [true, 'a user must have a password'],

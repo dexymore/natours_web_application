@@ -12,7 +12,10 @@ const {
   getToursStats,
   getMonthlyPlan,
   getToursWithin,
-  getDistances
+  getDistances,
+  uploadTourImages,
+  resizeTourImages
+
 } = require('../controllers/tourControllers');
 
 const toursRouter = express.Router();
@@ -27,7 +30,7 @@ toursRouter.route('/monthly-plan/:year').get(auth.protect, auth.restrict('admin'
 toursRouter
   .route('/:id')
   .get(getTour)
-  .patch(auth.protect, auth.restrict('admin', 'lead-guide'),updateTour)
+  .patch(auth.protect, auth.restrict('admin', 'lead-guide'),uploadTourImages,  resizeTourImages,updateTour)
   .delete(auth.protect, auth.restrict('admin', 'lead-guide'), delteTour);
 // toursRouter
 //   .route('/:tourId/reviews')

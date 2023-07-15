@@ -4,7 +4,49 @@ const AppError = require('../utils/appError');
 
 const User = require('../models/userModal');
 
+const multer = require('multer');
+
 const factory=require('./handlerFactory')
+
+const sharp=require('sharp')
+
+// this is used to upload photos to the server
+// const multerStorage = multer.diskStorage({
+// destination: (req, file, cb) => {
+// cb(null, 'public/img/users');
+
+// },
+// filename: (req, file, cb) => {
+// const ext = file.mimetype.split('/')[1];
+// cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+
+// }
+// });
+// this is used to upload photos to the memory
+const multerStorage=multer.memoryStorage()
+
+const multerFilter = (req, file, cb) => {
+if(file.mimetype.startsWith('image')){
+cb(null, true);
+}
+else{
+cb(new AppError('please upload only images',400),false);
+
+}
+
+};
+exports.resizePhoto=catchAsync(async(req,res,next)=>{
+if(!req.file) return next()
+//here we are using the sharp module to resize the image and to convert it to jpeg format and finally to save it to the server 
+req.file.filename=`user-${req.user.id}-${Date.now()}.jpeg`
+
+await sharp(req.file.buffer).resize(650,650).toFormat('jpeg').jpeg({quality:90}).toFile(`public/img/users/${req.file.filename}`)
+next()
+})
+
+
+const upload=multer({storage:multerStorage,fileFilter:multerFilter})
+exports.uploadUserPhoto=upload.single('photo')
 
 const filteredObj = function (obj, ...objkeys) {
   const filteredobject = {};
@@ -19,6 +61,8 @@ next()
 }
 
 exports.updateme = catchAsync(async (req, res, next) => {
+
+
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
@@ -28,6 +72,7 @@ exports.updateme = catchAsync(async (req, res, next) => {
     );
   }
   const filteredBody = filteredObj(req.body, 'name', 'email');
+if(req.file) filteredBody.photo=req.file.filename
 
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,

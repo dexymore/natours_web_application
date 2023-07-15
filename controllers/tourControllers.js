@@ -1,11 +1,16 @@
 const express = require('express');
 
+const multer = require('multer');
+
+const sharp=require('sharp')
+
 const catchAsync= require('../utils/catchAsync')
 
 // eslint-disable-next-line import/extensions
 // const ApiFeatures = require('../utils/apiFeatuers');
 const Tour = require('../models/tourModal');
 // const AppError = require('../utils/appError');
+
 
 const factory=require('./handlerFactory');
 const AppError = require('../utils/appError');
@@ -23,6 +28,49 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.sort = '-ratingsAverage,price';
   next();
 };
+
+const multerStorage=multer.memoryStorage()
+
+const multerFilter = (req, file, cb) => {
+if(file.mimetype.startsWith('image')){
+cb(null, true);
+}
+else{
+cb(new AppError('please upload only images',400),false);
+
+}
+
+};
+
+const upload=multer({storage:multerStorage,fileFilter:multerFilter})
+
+// when it is a single photo we use upload.single('photo') when its multiple we use upload.array('photo',5) 
+//when its multiple(mix) but with different names we use upload.fields([{name:'photo',maxCount:1},{name:'images',maxCount:3}]) 
+exports.uploadTourImages=upload.fields([
+  {name:'imageCover',maxCount:1},
+  {name:'images',maxCount:3}
+
+])
+
+// upload.single('photo') req.file
+// upload.array('photo',5) req.files
+exports.resizeTourImages=catchAsync(async(req,res,next)=>{
+if(!req.files.imageCover||!req.files.images) return next()
+
+req.body.imageCover=`tour-${req.params.id}-${Date.now()}-cover.jpeg`
+await sharp(req.files.imageCover[0].buffer).resize(2000,1333).toFormat('jpeg').jpeg({quality:90}).toFile(`public/img/tours/${req.body.imageCover}`)
+
+await Promise.all( req.files.images.map(async(file,index)=>{
+  const filename=`tour-${req.params.id}-${Date.now()}-${index+1}.jpeg`
+  await sharp(file.buffer).resize(2000,1333).toFormat('jpeg').jpeg({quality:90}).toFile(`public/img/tours/${filename}`)
+
+  req.body.images.push(filename)
+
+  
+}))
+
+next()
+})
 
 exports.getAllTours =factory.getAlldocs(Tour)
 

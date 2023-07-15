@@ -99,7 +99,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-  }
+  }else if(req.cookies.jwt){token=req.cookies.jwt}
   if (!token) {
     return next(new AppError('you are not logged in to ', 401));
   }
@@ -125,7 +125,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   // access granted
+
   req.user = freshUser;
+  res.locals.user=freshUser
   next();
 });
 // Define a function called "restrict" that accepts any number of roles as arguments.
@@ -225,3 +227,44 @@ await user.save()
 //4)logging the user in
 createSendToken(user,200,res)
 });
+
+
+
+
+exports.isLoggedIn = async (req, res, next) => {
+  if(req.cookies.jwt) {
+  try{
+
+ 
+
+
+
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+
+  const freshUser = await User.findById(decoded.id);
+
+  if (!freshUser) {
+    return next();
+  }
+
+  if (freshUser.changedAasswordAfter(decoded.iat)) {
+    return next(
+     
+    );
+  }
+res.locals.user=freshUser
+  req.user = freshUser;
+  return next();}catch(err){  return next()}}next();
+};
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now()+10*1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+}
