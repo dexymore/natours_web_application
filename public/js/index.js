@@ -8,6 +8,7 @@ import {updateSettings} from './updateSettings'
 
 import {displayMap} from './mapbox'
 import { doc } from 'prettier';
+import { bookTour } from './stripe';
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');  
 const loginForm = document.querySelector('.form--login');
@@ -15,6 +16,7 @@ const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const signUpForm = document.querySelector('.form--signup');
+const bookbtn = document.getElementById('book-tour');
 
 // Values
 
@@ -80,3 +82,12 @@ signUp(email, password,name,passwordConfirm);
 })
 }
 
+if(bookbtn){
+bookbtn.addEventListener('click',e=>{
+    e.target.textContent='processing...';
+    const tourId = e.target.dataset.tourId;
+
+    bookTour(tourId);
+})
+
+}

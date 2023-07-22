@@ -10,7 +10,7 @@ const AppError = require('../utils/appError');
 
 const catchAsync = require('../utils/catchAsync');
 
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 
 
@@ -56,10 +56,16 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     passwordchangedat: req.body.passwordchangedat,
     role: req.body.role,
+    photo: req.body.photo,
   });
   // Code snippet 2: Passing entire req.body object
   //const newUser = await User.create(req.body);
   // Here, all properties in the req.body object will be passed to the User.create() method without specifing what to pass.
+const url=`${req.protocol}://${req.get('host')}/me`
+await new Email(newUser,url).sendWelcome()
+
+
+
 createSendToken(newUser,201,res)
 
 });
@@ -157,17 +163,14 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) send user email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetpassword/${resetToken}`;
 
-  const message = `forgot your password?submit a new password with a patch request to :${resetURL}.\n if not please agnore this meassage  `;
+
+  // const message = `forgot your password?submit a new password with a patch request to :${resetURL}.\n if not please agnore this meassage  `;
   try {
-    await sendEmail({
-      email: req.body.email,
-      subject: 'reset password token (valid for 10 mins only)',
-      message:message,
-    });
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/resetpassword/${resetToken}`;
+ await new Email(user,resetURL).passwordReset() 
     res.status(200).json({ status: 'success', meassage: 'token sent to mail' });
   } catch (err) {
     user.passwordResetToken = undefined;

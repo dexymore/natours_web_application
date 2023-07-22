@@ -6,7 +6,11 @@ const helmet = require('helmet');
 const mongoSanitize=require('express-mongo-sanitize')
 const xssClean= require('xss-clean')
 const hpp= require('hpp')
+
+const cookieParser = require('cookie-parser');
+
 const AppError=require('./utils/appError')
+
 
 const globalErorrHandler= require('./controllers/errorController')
 
@@ -15,7 +19,8 @@ const reviewRouter = require('./routes/reviewRoute');
 const usersRouter = require('./routes/usersRoute');
 const viewRouter = require('./routes/viewRoute');
 
-const cookieParser = require('cookie-parser');
+const bookingRouter=require('./routes/bookingRoute')
+
 
 const app = express(); // create our app with express
 // this is used to set the pug template engine  
@@ -86,6 +91,10 @@ app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/tours', toursRouter);
 
 app.use('/api/v1/reviews',reviewRouter);
+
+app.use('/api/v1/bookings',bookingRouter)
+
+
  //the idea of this function is that if we reached this point at our coe thats mean that we neither could resolved the requested path 
  // at our tours and our users routes also so we made this middleware to send the an error response to end users 
 
