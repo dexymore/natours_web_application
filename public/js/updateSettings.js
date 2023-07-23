@@ -3,7 +3,7 @@ import axios from 'axios';
 import {showAlert} from './alert'
 import '@babel/polyfill'
 export const updateSettings = async (data,type) => { 
-    const url = type==='password'?'http://127.0.0.1:3000/api/v1/users/updatemypassword':'http://127.0.0.1:3000/api/v1/users/updateme'
+    const url = type==='password'?'/api/v1/users/updatemypassword':'/api/v1/users/updateme'
     try{
         const result=await axios({
             method: 'patch',

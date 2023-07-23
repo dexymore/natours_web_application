@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 // Add a listener for any unchaught expections  events
 process.on('uncaughtException', err => {
   // Log the error name and message to the console
-  console.log("🔴",err.name, err.message);
+  // console.log("🔴",err.name, err.message);
 
   // Log that the server is shutting down
   console.log('uncaughtException','shutting down..');

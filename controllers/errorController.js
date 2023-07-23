@@ -14,7 +14,7 @@ const handleValidationErrorDB = (err) => {
 
 const handleDuplicateFieldDb =function (err)  {
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-  console.log(value)
+  // console.log(value)
   const message = `duplicate feild value:${value}`
   return new AppError(message, 400);
 };
@@ -65,7 +65,7 @@ const sendErorrProd = (err, req,res) => {
 // B) RENDERED WEBSITE
 // A) Operational, trusted error: send message to client
 if (err.isOperational) {
-  console.log(err);
+  // console.log(err);
   return res.status(err.statusCode).render('error', {
     title: 'Something went wrong!',
     msg: err.message

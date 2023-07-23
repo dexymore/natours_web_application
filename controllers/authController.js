@@ -92,8 +92,8 @@ exports.login = catchAsync(async (req, res, next) => {
   const issuedAt = new Date(decoded.iat * 1000); // Convert Unix timestamp to milliseconds
   const expirationTime = new Date(decoded.exp * 1000); // Convert Unix timestamp to milliseconds
 
-  console.log('Token was issued at:', issuedAt.toISOString());
-  console.log('Token will expire at:', expirationTime.toISOString())
+  // console.log('Token was issued at:', issuedAt.toISOString());
+  // console.log('Token will expire at:', expirationTime.toISOString())
   createSendToken(user,200,res)
  
 });
@@ -116,11 +116,11 @@ exports.protect = catchAsync(async (req, res, next) => {
   const issuedAt = new Date(decoded.iat * 1000); // Convert Unix timestamp to milliseconds
   const expirationTime = new Date(decoded.exp * 1000); // Convert Unix timestamp to milliseconds
 
-  console.log('Token was issued at:', issuedAt.toISOString());
-  console.log('Token will expire at:', expirationTime.toISOString());
+  // console.log('Token was issued at:', issuedAt.toISOString());
+  // console.log('Token will expire at:', expirationTime.toISOString());
   //3) checek if user still exists
   const freshUser = await User.findById(decoded.id);
-  console.log(freshUser);
+  // console.log(freshUser);
   if (freshUser === null) {
     return next(new AppError('this user is not exist anymore ', 404));
   }

@@ -6,8 +6,9 @@ const helmet = require('helmet');
 const mongoSanitize=require('express-mongo-sanitize')
 const xssClean= require('xss-clean')
 const hpp= require('hpp')
-
+const compression=require('compression')
 const cookieParser = require('cookie-parser');
+
 
 const AppError=require('./utils/appError')
 
@@ -43,6 +44,9 @@ app.use(express.json({limit:'10kb'})); //using middleware
 app.use(cookieParser());
 // this used to prevent noSQl injections attack and should be put under the line where we allow to recive inputs from user
 
+
+app.use(compression())
+
 app.use(mongoSanitize())
 // this used to prevent injection of hTml and javascript code in users inputs
 app.use(xssClean())
@@ -56,7 +60,7 @@ app.use(hpp({whitelist:['duration',  "ratingsAverage", "ratingsQuantity", "maxGr
 //   // not that in express everthing goes sequntial so the middleware should be before the request resaponse function you want to use the middleware at
 //   next();
 // });
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // log every request to the console

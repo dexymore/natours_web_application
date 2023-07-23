@@ -18,9 +18,7 @@ module.exports = class Email {
       // Replace the return statement with your production transport configuration
 
   return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    service: 'gmail',
     auth: {
       user: process.env.GMAIL_USERNAME,
       pass: process.env.GMAIL_PASSWORD,
