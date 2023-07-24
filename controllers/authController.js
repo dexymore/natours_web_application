@@ -27,47 +27,24 @@ const signToken = function (id) {
     process.env.JWT_SECRET
   );
 };
-const createSendToken = function (user, statusCode, res) {
-  // Import required libraries and functions (e.g., signToken) if not already done
+const createSendToken = function(user,statuscode,res){
   const token = signToken(user._id);
+const cookiesOptions={
+expires:new Date(Date.now()+process.env.JWT_EXPIRES_IN_COOKIE*24*60*60*1000),
+httpOnly:true
+}
+if(process.env.NODE_ENV==="production") cookiesOptions.secure=true
 
-  // Ensure that JWT_EXPIRES_IN_COOKIE is set in seconds (e.g., 3600 seconds for 1 hour)
-  const jwtExpiresIn = parseInt(process.env.JWT_EXPIRES_IN_COOKIE, 10);
-  
-  if (isNaN(jwtExpiresIn)) {
-    // Handle the case where JWT_EXPIRES_IN_COOKIE is not a valid number
-    return res.status(500).json({ status: 'error', message: 'Invalid JWT_EXPIRES_IN_COOKIE value' });
-  }
-
-  // Calculate the expiration time for the cookie
-  const cookieExpiration = new Date(Date.now() + jwtExpiresIn * 1000);
-
-  // Set the cookie options
-  const cookiesOptions = {
-    expires: cookieExpiration,
-    httpOnly: true
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    cookiesOptions.secure = true;
-  }
-
-  // Set the JWT cookie in the response
-  res.cookie('jwt', token, cookiesOptions);
-
-  // Remove password from the user object before sending the response
-  user.password = undefined;
-
-  // Send the response with the token and user data
-  res.status(statusCode).json({
+res.cookie('jwt',token,cookiesOptions)
+user.password=undefined
+res.status(statuscode).json({
     status: 'success',
     token: token,
     data: {
-      user
+      user,
     },
   });
-};
-
+}
 exports.signup = catchAsync(async (req, res, next) => {
   // Code snippet 1: Explicitly defining object properties
 
