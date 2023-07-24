@@ -4,7 +4,8 @@
   "description": "jonas shmedtmann course",
   "main": "app.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node -r dotenv/config server.js"
+    ,
     "start:prod": "export NODE_ENV=production && node server.js",
     "debug": "ndb server.js",
     "watch:js": "parcel watch public/js/index.js --out-dir public/js --out-file bundle.js",
