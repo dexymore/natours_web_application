@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-require('dotenv').config();
+
 
 // Add a listener for any unchaught expections  events
 process.on('uncaughtException', err => {
