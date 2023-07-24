@@ -44,6 +44,7 @@ app.use(express.json({limit:'10kb'})); //using middleware
 app.use(cookieParser());
 // this used to prevent noSQl injections attack and should be put under the line where we allow to recive inputs from user
 
+app.enable('trust proxy')
 
 app.use(compression())
 
