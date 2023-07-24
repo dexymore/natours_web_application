@@ -30,7 +30,7 @@ const signToken = function (id) {
 const createSendToken = function(user,statuscode,res){
   const token = signToken(user._id);
   const cookiesOptions = {
-    expires: new Date(Date.now() + (process.env.JWT_EXPIRES_IN_COOKIE * 1000)), // JWT_EXPIRES_IN_COOKIE should be in seconds
+    maxAge: process.env.JWT_EXPIRES_IN_COOKIE * 1000, // JWT_EXPIRES_IN_COOKIE should be in seconds
     httpOnly: true
   };
 if(process.env.NODE_ENV==="production") cookiesOptions.secure=true
