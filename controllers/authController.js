@@ -30,9 +30,10 @@ const signToken = function (id) {
 const createSendToken = function(user,statuscode,res){
   const token = signToken(user._id);
   const cookiesOptions = {
-    maxAge: 3600000, // 1 hour in milliseconds
+    maxAge: parseInt(process.env.JWT_EXPIRES_IN_COOKIE,10) * 1000, // Convert to milliseconds
     httpOnly: true
   };
+  
 if(process.env.NODE_ENV==="production") cookiesOptions.secure=true
 
 res.cookie('jwt',token,cookiesOptions)
