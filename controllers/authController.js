@@ -27,28 +27,25 @@ const signToken = function (id) {
     process.env.JWT_SECRET
   );
 };
-const createSendToken = (user, statusCode, req, res) => {
+const createSendToken = function(user,statuscode,res){
   const token = signToken(user._id);
 
-  res.cookie('jwt', token, {
-    expires: new Date(
-      Date.now() + process.env.JWT_EXPIRES_IN_COOKIE * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
-  });
+  const cookiesOptions = {
+    expires: new Date(Date.now() + (process.env.JWT_EXPIRES_IN_COOKIE * 1000)), // JWT_EXPIRES_IN_COOKIE should be in seconds
+    httpOnly: true
+  };
+if(process.env.NODE_ENV==="production") cookiesOptions.secure=true
 
-  // Remove password from output
-  user.password = undefined;
-
-  res.status(statusCode).json({
+res.cookie('jwt',token,cookiesOptions)
+user.password=undefined
+res.status(statuscode).json({
     status: 'success',
-    token,
+    token: token,
     data: {
-      user
-    }
+      user,
+    },
   });
-};
+}
 exports.signup = catchAsync(async (req, res, next) => {
   // Code snippet 1: Explicitly defining object properties
 

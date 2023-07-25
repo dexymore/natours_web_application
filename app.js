@@ -31,6 +31,7 @@ app.use(express.static(path.join(__dirname,'public')))// this is used to set the
 app.use(helmet({ contentSecurityPolicy: false }));
 //1)global middlewares
 
+app.use(cookieParser());
 
 const limiter=rateLimit({
   // you shouldnot follow this blindely instead you should specify them depending on the service you provide 
@@ -41,7 +42,7 @@ message:"too many request from this ip please try again latter"
 app.use('/api',limiter)
 
 app.use(express.json({limit:'10kb'})); //using middleware
-app.use(cookieParser());
+
 // this used to prevent noSQl injections attack and should be put under the line where we allow to recive inputs from user
 
 app.enable('trust proxy')
