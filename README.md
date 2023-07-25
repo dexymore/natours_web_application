@@ -94,37 +94,15 @@ Before using the API, you need to set the variables in Postman depending on your
   - {{password}} with your user password as value.
   ```
 
-Check [Natours API Documentation](https://documenter.getpostman.com/view/8689170/SVmzvwpY?version=latest) for more info.
-
-<b> API Features: </b>
-
-Tours List 👉 https://lgope-natours.onrender.com/api/v1/tours
-
-Tours State 👉 https://lgope-natours.onrender.com/api/v1/tours/tour-stats
-
-Get Top 5 Cheap Tours 👉 https://lgope-natours.onrender.com/api/v1/tours/top-5-cheap
-
-Get Tours Within Radius 👉 https://lgope-natours.onrender.com/api/v1/tours/tours-within/200/center/34.098453,-118.096327/unit/mi
-
 
 
 ## Deployment
-The website is deployed with git into heroku. Below are the steps taken:
-```
-git init
-git add -A
-git commit -m "Commit message"
-heroku login
-heroku create
-heroku config:set CONFIG_KEY=CONFIG_VALUE
-parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js
-git push heroku master
-heroku open
+The website is deployed with git into railway
+
 ```
 You can also changed your website url by running this command:
 ```
-heroku apps:rename natours-users
-```
+
 
 
 ## Build With
@@ -138,8 +116,8 @@ heroku apps:rename natours-users
 * [ParcelJS](https://parceljs.org/) - Blazing fast, zero configuration web application bundler
 * [Stripe](https://stripe.com/) - Online payment API
 * [Postman](https://www.getpostman.com/) - API testing
-* [Mailtrap](https://mailtrap.io/) & [Sendgrid](https://sendgrid.com/) - Email delivery platform
-* [Heroku](https://www.heroku.com/) - Cloud platform
+* [Mailtrap](https://mailtrap.io/) & [Gmail](https://gmail.com/) - Email delivery platform
+* [Railway](https://www.railway.com/) - Cloud platform
 
 
 
@@ -173,7 +151,7 @@ eslint-plugin-import eslint-plugin-jsx-a11y  eslint-plugin-react --save-dev
 
 
 ## Known Bugs
-Feel free to email me at lakshman.gope2@gmail.com if you run into any issues or have questions, ideas or concerns.
+Feel free to email me at af773942@gmail.com if you run into any issues or have questions, ideas or concerns.
 Please enjoy and feel free to share your opinion, constructive criticism, or comments about my work. Thank you! 🙂
 
 ## Future Updates
